@@ -20,10 +20,11 @@ function findAnimalByNumber(num: number): ZodiacAnimal | undefined {
   return zodiacConfig.find(a => a.numbers.includes(num))
 }
 
-export function generateHistory(assignedAnimals: string[]): HistoryRecord[] {
+export function generateHistory(): HistoryRecord[] {
   const records: HistoryRecord[] = []
   const rng = seededRandom(20260401)
   const baseDate = new Date('2026-04-28')
+  const fixedAnimals = ['马', '羊']
 
   for (let i = 0; i < 20; i++) {
     const date = new Date(baseDate)
@@ -38,18 +39,16 @@ export function generateHistory(assignedAnimals: string[]): HistoryRecord[] {
     let aiPrediction: string
 
     if (shouldMatch) {
-      // Pick a number from assigned animals
-      const animalName = assignedAnimals[Math.floor(rng() * assignedAnimals.length)]
+      const animalName = fixedAnimals[Math.floor(rng() * fixedAnimals.length)]
       const numbers = getAnimalNumbers(animalName)
       openNumber = numbers[Math.floor(rng() * numbers.length)]
       aiPrediction = animalName
     } else {
-      // Pick from non-assigned animals
-      const nonAssigned = zodiacConfig.filter(a => !assignedAnimals.includes(a.name))
-      const animal = nonAssigned[Math.floor(rng() * nonAssigned.length)]
+      const nonFixed = zodiacConfig.filter(a => !fixedAnimals.includes(a.name))
+      const animal = nonFixed[Math.floor(rng() * nonFixed.length)]
       const numbers = getAnimalNumbers(animal.name)
       openNumber = numbers[Math.floor(rng() * numbers.length)]
-      aiPrediction = assignedAnimals[Math.floor(rng() * assignedAnimals.length)]
+      aiPrediction = fixedAnimals[Math.floor(rng() * fixedAnimals.length)]
     }
 
     const openAnimalData = findAnimalByNumber(openNumber)

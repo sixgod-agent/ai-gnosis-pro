@@ -2,11 +2,10 @@ import { motion } from 'framer-motion'
 import { BarChart3 } from 'lucide-react'
 import { zodiacConfig } from '../lib/zodiacConfig'
 
-interface ZodiacOverviewProps {
-  assignedAnimals: string[]
-}
+// 固定的"高亮"生肖 - 所有人看到一样
+const HIGHLIGHT_ANIMALS = ['马', '羊']
 
-export default function ZodiacOverview({ assignedAnimals }: ZodiacOverviewProps) {
+export default function ZodiacOverview() {
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
@@ -26,7 +25,7 @@ export default function ZodiacOverview({ assignedAnimals }: ZodiacOverviewProps)
 
       <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 sm:gap-2">
         {zodiacConfig.map((animal, i) => {
-          const isAssigned = assignedAnimals.includes(animal.name)
+          const isHighlighted = HIGHLIGHT_ANIMALS.includes(animal.name)
           return (
             <motion.div
               key={animal.name}
@@ -34,13 +33,13 @@ export default function ZodiacOverview({ assignedAnimals }: ZodiacOverviewProps)
               animate={{ scale: 1 }}
               transition={{ delay: 0.4 + i * 0.05, type: 'spring', stiffness: 200 }}
               className={`rounded-lg p-2 text-center transition-all ${
-                isAssigned
+                isHighlighted
                   ? 'bg-neon-green/10 border border-neon-green/30 glow-green'
                   : 'bg-bg-tertiary/30 border border-border/30'
               }`}
             >
               <div className="text-lg mb-0.5">{animal.emoji}</div>
-              <div className={`text-xs font-bold ${isAssigned ? 'text-neon-green' : 'text-text-secondary'}`}>
+              <div className={`text-xs font-bold ${isHighlighted ? 'text-neon-green' : 'text-text-secondary'}`}>
                 {animal.name}
               </div>
               <div className="flex flex-wrap gap-0.5 mt-1 justify-center">
@@ -48,7 +47,7 @@ export default function ZodiacOverview({ assignedAnimals }: ZodiacOverviewProps)
                   <span
                     key={n}
                     className={`text-[8px] px-1 rounded number-mono ${
-                      isAssigned
+                      isHighlighted
                         ? 'bg-neon-green/15 text-neon-green'
                         : 'bg-bg-tertiary text-text-secondary/60'
                     }`}

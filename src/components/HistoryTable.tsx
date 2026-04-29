@@ -4,12 +4,8 @@ import { zodiacConfig } from '../lib/zodiacConfig'
 import { generateHistory } from '../lib/history'
 import { useState, useEffect } from 'react'
 
-interface HistoryTableProps {
-  animals: string[]
-}
-
-export default function HistoryTable({ animals }: HistoryTableProps) {
-  const [history] = useState(() => generateHistory(animals))
+export default function HistoryTable() {
+  const [history] = useState(() => generateHistory())
   const matchCount = history.filter(r => r.match).length
   const matchRate = ((matchCount / history.length) * 100).toFixed(1)
 
@@ -141,7 +137,7 @@ export default function HistoryTable({ animals }: HistoryTableProps) {
                     <span>{animalData?.emoji}</span>
                     <span className="text-text-primary font-medium">{record.openAnimal}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-[9px] text-text-secondary number-mono">
+                  <div className="text-[9px] text-text-secondary number-mono">
                     {record.period.slice(4)}
                   </div>
                 </div>

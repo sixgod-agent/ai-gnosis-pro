@@ -2,13 +2,23 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Cpu, Activity, Wifi, Clock } from 'lucide-react'
 import { useAnimatedValue, useInterval } from '../hooks/useAnimatedValue'
-import { getRemainingTime } from '../lib/storage'
+
+function getTimeUntilMidnight(): string {
+  const now = new Date()
+  const midnight = new Date(now)
+  midnight.setHours(24, 0, 0, 0)
+  const diff = midnight.getTime() - now.getTime()
+  const h = Math.floor(diff / 3600000)
+  const m = Math.floor((diff % 3600000) / 60000)
+  const s = Math.floor((diff % 60000) / 1000)
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
 
 export default function AIStatusBar() {
   const [gpuLoad, setGpuLoad] = useState(74.2)
   const [convergence, setConvergence] = useState(0.9851)
   const [computePower, setComputePower] = useState(847.3)
-  const [timeLeft, setTimeLeft] = useState('24:00:00')
+  const [timeLeft, setTimeLeft] = useState(getTimeUntilMidnight())
 
   const animatedGpu = useAnimatedValue(gpuLoad, 1.5, 1)
   const animatedConv = useAnimatedValue(convergence, 1.5, 4)
@@ -18,7 +28,7 @@ export default function AIStatusBar() {
     setGpuLoad(prev => Math.max(60, Math.min(95, prev + (Math.random() - 0.48) * 2)))
     setConvergence(prev => Math.max(0.95, Math.min(0.9999, prev + (Math.random() - 0.45) * 0.002)))
     setComputePower(prev => Math.max(600, Math.min(1200, prev + (Math.random() - 0.5) * 30)))
-    setTimeLeft(getRemainingTime())
+    setTimeLeft(getTimeUntilMidnight())
   }, 2000)
 
   return (

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Brain, Lock, Fingerprint, Info } from 'lucide-react'
+import { Brain, Fingerprint, Info } from 'lucide-react'
 import NumberMatrix from './components/NumberMatrix'
 import LoadingScreen from './components/LoadingScreen'
 import AIStatusBar from './components/AIStatusBar'
@@ -30,7 +30,6 @@ export default function App() {
     <div className="min-h-screen bg-bg-primary relative">
       <NumberMatrix />
 
-      {/* Scan line effect */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <motion.div
           className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-green/30 to-transparent"
@@ -60,21 +59,13 @@ export default function App() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-2 px-2.5 py-1.5 rounded-lg glass-card">
-              <Fingerprint className="w-3 h-3 text-text-secondary" />
-              <div>
-                <div className="text-[9px] text-text-secondary">Analytic ID</div>
-                <div className="text-[10px] text-text-primary number-mono font-medium">
-                  {session.analyticId.slice(0, 18)}...
-                </div>
+          <div className="hidden md:flex items-center gap-2 px-2.5 py-1.5 rounded-lg glass-card">
+            <Fingerprint className="w-3 h-3 text-text-secondary" />
+            <div>
+              <div className="text-[9px] text-text-secondary">Analytic ID</div>
+              <div className="text-[10px] text-text-primary number-mono font-medium">
+                {session.analyticId.slice(0, 18)}...
               </div>
-            </div>
-            <div className="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-neon-green/5 border border-neon-green/20">
-              <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-neon-green" />
-              <span className="text-[9px] sm:text-[10px] text-neon-green font-medium">
-                {session.group}组 · 已锁定
-              </span>
             </div>
           </div>
         </motion.header>
@@ -84,9 +75,9 @@ export default function App() {
 
         {/* Main Content */}
         <div className="flex flex-col gap-3">
-          <MainPredictor animals={session.animals} group={session.group} />
-          <HistoryTable animals={session.animals} />
-          <ZodiacOverview assignedAnimals={session.animals} />
+          <MainPredictor />
+          <HistoryTable />
+          <ZodiacOverview />
         </div>
 
         {/* Footer */}

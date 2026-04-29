@@ -2,22 +2,18 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Target, Shield, Sparkles, TrendingUp, Zap } from 'lucide-react'
 import { zodiacConfig, getAnimalNumbers } from '../lib/zodiacConfig'
-import type { GroupKey } from '../lib/zodiacConfig'
 import { useAnimatedValue } from '../hooks/useAnimatedValue'
 
-interface MainPredictorProps {
-  animals: string[]
-  group: GroupKey
-}
+// 固定预测数据 - 所有用户看到一样的
+const PRIMARY_ANIMAL = '马'
+const HEDGING_NUMBERS = [1, 13, 25, 37, 49, 12]
 
-export default function MainPredictor({ animals, group }: MainPredictorProps) {
+export default function MainPredictor() {
   const [confidence, setConfidence] = useState(96.8)
   const animatedConf = useAnimatedValue(confidence, 1.2, 1)
 
-  const primaryAnimal = zodiacConfig.find(a => a.name === animals[0])!
-  const primaryNumbers = getAnimalNumbers(animals[0])
-  const allAssignedNumbers = animals.flatMap(a => getAnimalNumbers(a))
-  const hedgingNumbers = allAssignedNumbers.slice(0, 6)
+  const primaryAnimal = zodiacConfig.find(a => a.name === PRIMARY_ANIMAL)!
+  const primaryNumbers = getAnimalNumbers(PRIMARY_ANIMAL)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -61,7 +57,7 @@ export default function MainPredictor({ animals, group }: MainPredictorProps) {
           <div>
             <div className="text-xl sm:text-2xl font-bold text-text-primary">{primaryAnimal.name}</div>
             <div className="text-[10px] sm:text-xs text-text-secondary mt-0.5">
-              {group}组 - 深度神经网络分析结果
+              2026马年 · 深度神经网络分析结果
             </div>
             <div className="flex items-center gap-1 mt-1">
               <TrendingUp className="w-2.5 h-2.5 text-neon-green" />
@@ -137,7 +133,7 @@ export default function MainPredictor({ animals, group }: MainPredictorProps) {
         </div>
 
         <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3">
-          {hedgingNumbers.map((num, i) => {
+          {HEDGING_NUMBERS.map((num, i) => {
             const animal = zodiacConfig.find(a => a.numbers.includes(num))
             return (
               <motion.div
@@ -164,7 +160,7 @@ export default function MainPredictor({ animals, group }: MainPredictorProps) {
 
         <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
           {[
-            { label: '覆盖生肖', value: `${animals.length} 个`, color: 'text-neon-green' },
+            { label: '覆盖生肖', value: '4 个', color: 'text-neon-green' },
             { label: '波动系数', value: '0.847', color: 'text-gold' },
             { label: '对冲效率', value: '92.3%', color: 'text-blue-400' },
           ].map((stat) => (
