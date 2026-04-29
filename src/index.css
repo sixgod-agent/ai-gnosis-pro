@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-primary: #0B0E11;
+  --color-bg-secondary: #1E2329;
+  --color-bg-tertiary: #2B3139;
+  --color-bg-card: #181A20;
+  --color-neon-green: #02f1a6;
+  --color-gold: #F0B90B;
+  --color-neon-red: #F6465D;
+  --color-text-primary: #EAECEF;
+  --color-text-secondary: #848E9C;
+  --color-border: #2B3139;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0B0E11;
+  color: #EAECEF;
+  font-family: 'Inter', 'SF Mono', 'Fira Code', 'JetBrains Mono', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1E2329;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2B3139;
+  border-radius: 2px;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.glass-card {
+  background: rgba(24, 26, 32, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(43, 49, 57, 0.6);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(2, 241, 166, 0.15), 0 0 40px rgba(2, 241, 166, 0.05);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(240, 185, 11, 0.15), 0 0 40px rgba(240, 185, 11, 0.05);
+}
+
+.number-mono {
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace;
+  font-variant-numeric: tabular-nums;
+}
