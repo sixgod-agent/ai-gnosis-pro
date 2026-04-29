@@ -47,11 +47,11 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-bg-primary"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-bg-primary px-6"
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-6 sm:gap-8 w-full max-w-xs sm:max-w-sm">
           {/* Logo */}
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
@@ -59,8 +59,8 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className="relative"
           >
-            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-neon-green/20 to-gold/20 flex items-center justify-center border border-neon-green/30">
-              <Cpu className="w-12 h-12 text-neon-green" />
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-neon-green/20 to-gold/20 flex items-center justify-center border border-neon-green/30">
+              <Cpu className="w-8 h-8 sm:w-12 sm:h-12 text-neon-green" />
             </div>
             <motion.div
               className="absolute inset-0 rounded-2xl border border-neon-green/20"
@@ -76,11 +76,11 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
             transition={{ delay: 0.2 }}
             className="text-center"
           >
-            <h1 className="text-3xl font-bold tracking-tight text-text-primary">
+            <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-text-primary">
               AI-Gnosis <span className="text-neon-green">Pro v5.0</span>
             </h1>
-            <p className="text-text-secondary text-sm mt-2 number-mono">
-              量子增强型预测终端 | Quantum-Enhanced Prediction Terminal
+            <p className="text-text-secondary text-[10px] sm:text-sm mt-1.5 number-mono">
+              量子增强型预测终端
             </p>
           </motion.div>
 
@@ -89,7 +89,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="w-80"
+            className="w-full"
           >
             <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
               <motion.div
@@ -99,18 +99,18 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
               />
             </div>
 
-            <div className="flex items-center gap-3 mt-4">
-              <StepIcon className="w-4 h-4 text-neon-green animate-pulse" />
-              <span className="text-sm text-text-secondary number-mono">
+            <div className="flex items-center gap-2.5 mt-3">
+              <StepIcon className="w-3.5 h-3.5 text-neon-green animate-pulse" />
+              <span className="text-[11px] sm:text-sm text-text-secondary number-mono">
                 {steps[Math.min(currentStep, steps.length - 1)]?.label}
               </span>
             </div>
 
-            <div className="flex justify-between mt-2">
-              <span className="text-xs text-text-secondary number-mono">
+            <div className="flex justify-between mt-1.5">
+              <span className="text-[10px] sm:text-xs text-text-secondary number-mono">
                 {progress.toFixed(1)}%
               </span>
-              <span className="text-xs text-neon-green/60 number-mono">
+              <span className="text-[10px] sm:text-xs text-neon-green/60 number-mono">
                 LAYER {Math.min(currentStep + 1, steps.length)}/{steps.length}
               </span>
             </div>
@@ -121,7 +121,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="flex items-center gap-1 mt-4"
+            className="flex items-center gap-1 mt-2"
           >
             {Array.from({ length: 20 }).map((_, i) => (
               <motion.div

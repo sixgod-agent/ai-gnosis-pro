@@ -48,22 +48,22 @@ export default function App() {
           transition={{ duration: 0.5 }}
           className="flex items-center justify-between"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-green/20 to-gold/20 flex items-center justify-center border border-neon-green/20">
-              <Brain className="w-5 h-5 text-neon-green" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-neon-green/20 to-gold/20 flex items-center justify-center border border-neon-green/20">
+              <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-neon-green" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-text-primary tracking-tight leading-tight">
+              <h1 className="text-base sm:text-lg font-bold text-text-primary tracking-tight leading-tight">
                 AI-Gnosis <span className="text-neon-green">Pro v5.0</span>
               </h1>
-              <p className="text-[10px] text-text-secondary number-mono">
+              <p className="text-[9px] sm:text-[10px] text-text-secondary number-mono hidden xs:block">
                 量子增强型大数据预测终端 | 2026 马年周期
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg glass-card">
-              <Fingerprint className="w-3.5 h-3.5 text-text-secondary" />
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2 px-2.5 py-1.5 rounded-lg glass-card">
+              <Fingerprint className="w-3 h-3 text-text-secondary" />
               <div>
                 <div className="text-[9px] text-text-secondary">Analytic ID</div>
                 <div className="text-[10px] text-text-primary number-mono font-medium">
@@ -71,9 +71,9 @@ export default function App() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neon-green/5 border border-neon-green/20">
-              <Lock className="w-3 h-3 text-neon-green" />
-              <span className="text-[10px] text-neon-green font-medium">
+            <div className="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-neon-green/5 border border-neon-green/20">
+              <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-neon-green" />
+              <span className="text-[9px] sm:text-[10px] text-neon-green font-medium">
                 {session.group}组 · 已锁定
               </span>
             </div>

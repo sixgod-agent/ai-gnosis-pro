@@ -26,57 +26,50 @@ export default function AIStatusBar() {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, delay: 0.1 }}
-      className="glass-card rounded-xl px-4 py-3 flex items-center justify-between gap-4 flex-wrap"
+      className="glass-card rounded-xl px-3 py-2.5 sm:px-4 sm:py-3"
     >
-      <div className="flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
-        <span className="text-xs font-semibold text-neon-green tracking-wider uppercase">
-          系统在线 | SYSTEM ONLINE
-        </span>
-      </div>
-
-      <div className="flex items-center gap-6 flex-wrap">
-        {/* GPU Load */}
-        <div className="flex items-center gap-2">
-          <Cpu className="w-3.5 h-3.5 text-gold" />
-          <span className="text-xs text-text-secondary">GPU 负载</span>
-          <span className="text-xs font-bold text-gold number-mono">
-            {animatedGpu}%
+      {/* Mobile: compact row */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
+          <span className="text-[10px] sm:text-xs font-semibold text-neon-green tracking-wider uppercase">
+            系统在线
           </span>
-          <div className="w-16 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-gold"
-              animate={{ width: `${animatedGpu}%` }}
-              transition={{ duration: 0.5 }}
-            />
+        </div>
+        {/* Desktop metrics */}
+        <div className="hidden sm:flex items-center gap-4 lg:gap-6 flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <Cpu className="w-3 h-3 text-gold" />
+            <span className="text-[10px] text-text-secondary">GPU</span>
+            <span className="text-[10px] font-bold text-gold number-mono">{animatedGpu}%</span>
+            <div className="w-12 h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full bg-gold"
+                animate={{ width: `${animatedGpu}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Activity className="w-3 h-3 text-neon-green" />
+            <span className="text-[10px] text-text-secondary">收敛度</span>
+            <span className="text-[10px] font-bold text-neon-green number-mono">{animatedConv}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Wifi className="w-3 h-3 text-blue-400" />
+            <span className="text-[10px] text-text-secondary">算力</span>
+            <span className="text-[10px] font-bold text-blue-400 number-mono">{animatedCompute} TF</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-3 h-3 text-text-secondary" />
+            <span className="text-[10px] font-bold text-text-primary number-mono">{timeLeft}</span>
           </div>
         </div>
-
-        {/* Convergence */}
-        <div className="flex items-center gap-2">
-          <Activity className="w-3.5 h-3.5 text-neon-green" />
-          <span className="text-xs text-text-secondary">模型收敛度</span>
-          <span className="text-xs font-bold text-neon-green number-mono">
-            {animatedConv}
-          </span>
-        </div>
-
-        {/* Compute Power */}
-        <div className="flex items-center gap-2">
-          <Wifi className="w-3.5 h-3.5 text-blue-400" />
-          <span className="text-xs text-text-secondary">实时算力</span>
-          <span className="text-xs font-bold text-blue-400 number-mono">
-            {animatedCompute} TFLOPS
-          </span>
-        </div>
-
-        {/* Session Timer */}
-        <div className="flex items-center gap-2">
-          <Clock className="w-3.5 h-3.5 text-text-secondary" />
-          <span className="text-xs text-text-secondary">分片锁定</span>
-          <span className="text-xs font-bold text-text-primary number-mono">
-            {timeLeft}
-          </span>
+        {/* Mobile: just show key values */}
+        <div className="flex sm:hidden items-center gap-3 text-[9px] number-mono">
+          <span className="text-gold font-bold">GPU {animatedGpu}%</span>
+          <span className="text-neon-green font-bold">{animatedConv}</span>
+          <span className="text-text-primary font-bold">{timeLeft}</span>
         </div>
       </div>
     </motion.div>

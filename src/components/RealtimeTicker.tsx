@@ -53,7 +53,6 @@ export default function RealtimeTicker({ group }: { group: string }) {
   const msgIdRef = useRef(0)
 
   useEffect(() => {
-    // Initial messages
     const initial: Message[] = Array.from({ length: 8 }, () => ({
       ...generateMessage(group),
       id: msgIdRef.current++,
@@ -83,46 +82,43 @@ export default function RealtimeTicker({ group }: { group: string }) {
       initial={{ x: 30, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.6, delay: 0.5 }}
-      className="glass-card rounded-xl p-4 flex flex-col h-full min-h-[500px]"
+      className="glass-card rounded-xl p-3 sm:p-4 flex flex-col h-full sm:min-h-[500px]"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Bell className="w-4 h-4 text-neon-green" />
-          <h2 className="text-sm font-bold text-text-primary tracking-wide uppercase">
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-1.5">
+          <Bell className="w-3.5 h-3.5 text-neon-green" />
+          <h2 className="text-[11px] sm:text-sm font-bold text-text-primary tracking-wide uppercase">
             实时播报 | Live Feed
           </h2>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
-          <span className="text-[10px] text-neon-green number-mono">LIVE</span>
+          <span className="text-[9px] sm:text-[10px] text-neon-green number-mono">LIVE</span>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-2 mb-3">
-        <div className="bg-bg-tertiary/50 rounded-lg p-2 text-center">
-          <div className="text-[9px] text-text-secondary">在线节点</div>
-          <div className="text-sm font-bold text-neon-green number-mono">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 mb-2.5">
+        <div className="bg-bg-tertiary/50 rounded-lg p-1.5 sm:p-2 text-center">
+          <div className="text-[8px] sm:text-[9px] text-text-secondary">在线节点</div>
+          <div className="text-xs sm:text-sm font-bold text-neon-green number-mono">
             {stats.online.toLocaleString()}
           </div>
         </div>
-        <div className="bg-bg-tertiary/50 rounded-lg p-2 text-center">
-          <div className="text-[9px] text-text-secondary">已验证用户</div>
-          <div className="text-sm font-bold text-gold number-mono">
+        <div className="bg-bg-tertiary/50 rounded-lg p-1.5 sm:p-2 text-center">
+          <div className="text-[8px] sm:text-[9px] text-text-secondary">已验证用户</div>
+          <div className="text-xs sm:text-sm font-bold text-gold number-mono">
             {stats.verified.toLocaleString()}
           </div>
         </div>
       </div>
 
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-1.5 pr-1">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-1 sm:space-y-1.5 pr-1 min-h-[200px] sm:min-h-[350px]">
         {messages.map((msg) => (
           <motion.div
             key={msg.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`rounded-lg px-2.5 py-1.5 text-[11px] ${
+            className={`rounded-lg px-2 py-1.5 text-[10px] sm:text-[11px] ${
               msg.type === 'system'
                 ? 'bg-neon-green/5 border border-neon-green/10 text-neon-green/80'
                 : 'bg-bg-tertiary/50 border border-border/30 text-text-secondary'
@@ -130,13 +126,13 @@ export default function RealtimeTicker({ group }: { group: string }) {
           >
             <div className="flex items-start gap-1.5">
               {msg.type === 'user' ? (
-                <Verified className="w-3 h-3 text-gold mt-0.5 flex-shrink-0" />
+                <Verified className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gold mt-0.5 flex-shrink-0" />
               ) : (
-                <MessageSquare className="w-3 h-3 text-neon-green mt-0.5 flex-shrink-0" />
+                <MessageSquare className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-neon-green mt-0.5 flex-shrink-0" />
               )}
               <div className="flex-1 min-w-0">
                 <span className="break-all">{msg.text}</span>
-                <div className="text-[8px] text-text-secondary/50 mt-0.5 number-mono text-right">
+                <div className="text-[7px] sm:text-[8px] text-text-secondary/50 mt-0.5 number-mono text-right">
                   {msg.time}
                 </div>
               </div>

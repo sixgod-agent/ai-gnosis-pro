@@ -12,19 +12,19 @@ export default function ZodiacOverview({ assignedAnimals }: ZodiacOverviewProps)
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, delay: 0.35 }}
-      className="glass-card rounded-xl p-5"
+      className="glass-card rounded-xl p-3 sm:p-5"
     >
-      <div className="flex items-center gap-2 mb-4">
-        <BarChart3 className="w-4 h-4 text-gold" />
-        <h2 className="text-sm font-bold text-text-primary tracking-wide uppercase">
+      <div className="flex items-center gap-2 mb-3">
+        <BarChart3 className="w-3.5 h-3.5 text-gold" />
+        <h2 className="text-[11px] sm:text-sm font-bold text-text-primary tracking-wide uppercase">
           12 生肖号码矩阵 | Zodiac Matrix 2026
         </h2>
-        <span className="text-[9px] px-1.5 py-0.5 rounded bg-gold/10 text-gold border border-gold/20 ml-auto">
+        <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded bg-gold/10 text-gold border border-gold/20 ml-auto">
           马年周期
         </span>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2">
+      <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 sm:gap-2">
         {zodiacConfig.map((animal, i) => {
           const isAssigned = assignedAnimals.includes(animal.name)
           return (
