@@ -6,7 +6,6 @@ import LoadingScreen from './components/LoadingScreen'
 import AIStatusBar from './components/AIStatusBar'
 import MainPredictor from './components/MainPredictor'
 import HistoryTable from './components/HistoryTable'
-import RealtimeTicker from './components/RealtimeTicker'
 import ZodiacOverview from './components/ZodiacOverview'
 import { getSession } from './lib/storage'
 
@@ -84,18 +83,10 @@ export default function App() {
         <AIStatusBar />
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-3">
-          {/* Left: Main predictor + history + zodiac */}
-          <div className="xl:col-span-3 flex flex-col gap-3">
-            <MainPredictor animals={session.animals} group={session.group} />
-            <HistoryTable animals={session.animals} />
-            <ZodiacOverview assignedAnimals={session.animals} />
-          </div>
-
-          {/* Right: Real-time ticker */}
-          <div className="xl:col-span-1">
-            <RealtimeTicker group={`${session.group}`} />
-          </div>
+        <div className="flex flex-col gap-3">
+          <MainPredictor animals={session.animals} group={session.group} />
+          <HistoryTable animals={session.animals} />
+          <ZodiacOverview assignedAnimals={session.animals} />
         </div>
 
         {/* Footer */}
