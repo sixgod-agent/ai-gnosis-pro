@@ -4,9 +4,12 @@ import { Brain, Fingerprint, Info } from 'lucide-react'
 import NumberMatrix from './components/NumberMatrix'
 import LoadingScreen from './components/LoadingScreen'
 import AIStatusBar from './components/AIStatusBar'
+import CountdownTimer from './components/CountdownTimer'
 import MainPredictor from './components/MainPredictor'
 import HistoryTable from './components/HistoryTable'
 import ZodiacOverview from './components/ZodiacOverview'
+import TrendChart from './components/TrendChart'
+import ModelInfo from './components/ModelInfo'
 import { getSession } from './lib/storage'
 
 export default function App() {
@@ -73,11 +76,16 @@ export default function App() {
         {/* AI Status Bar */}
         <AIStatusBar />
 
+        {/* Countdown Timer */}
+        <CountdownTimer />
+
         {/* Main Content */}
         <div className="flex flex-col gap-3">
           <MainPredictor />
+          <TrendChart />
           <HistoryTable />
           <ZodiacOverview />
+          <ModelInfo />
         </div>
 
         {/* Footer */}
