@@ -9,6 +9,13 @@ import MainPredictor from './components/MainPredictor'
 import HistoryTable from './components/HistoryTable'
 import ZodiacOverview from './components/ZodiacOverview'
 import TrendChart from './components/TrendChart'
+import ColorAnalysis from './components/ColorAnalysis'
+import HotColdRanking from './components/HotColdRanking'
+import MissingValues from './components/MissingValues'
+import AIRecommendation from './components/AIRecommendation'
+import TodayPick from './components/TodayPick'
+import ExpertBoard from './components/ExpertBoard'
+import Leaderboard from './components/Leaderboard'
 import ModelInfo from './components/ModelInfo'
 import { getSession } from './lib/storage'
 
@@ -79,14 +86,41 @@ export default function App() {
         {/* Countdown Timer */}
         <CountdownTimer />
 
-        {/* Main Content */}
-        <div className="flex flex-col gap-3">
-          <MainPredictor />
+        {/* Main Predictor */}
+        <MainPredictor />
+
+        {/* Today's Picks */}
+        <TodayPick />
+
+        {/* AI Recommendation */}
+        <AIRecommendation />
+
+        {/* Trend Charts & Analysis */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <TrendChart />
-          <HistoryTable />
-          <ZodiacOverview />
-          <ModelInfo />
+          <ColorAnalysis />
         </div>
+
+        {/* Hot/Cold & Missing Values */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <HotColdRanking />
+          <MissingValues />
+        </div>
+
+        {/* History Table */}
+        <HistoryTable />
+
+        {/* Expert Board & Leaderboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <ExpertBoard />
+          <Leaderboard />
+        </div>
+
+        {/* Zodiac Overview */}
+        <ZodiacOverview />
+
+        {/* Model Info */}
+        <ModelInfo />
 
         {/* Footer */}
         <motion.footer
@@ -102,7 +136,7 @@ export default function App() {
             </span>
           </div>
           <div className="text-[9px] text-text-secondary/30 number-mono">
-            AI-Gnosis Pro v5.0 &copy; 2026 | Quantum-Enhanced Prediction Terminal | All data is simulated
+            AI-Gnosis Pro v5.0 &copy; 2026 | Quantum-Enhanced Prediction Terminal | All data is real-time
           </div>
         </motion.footer>
       </div>
