@@ -1,27 +1,17 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ZODIAC_MAP } from '../lib/zodiacConfig';
 
-interface StageDef {
-  getText: (excluded: string) => string;
-  duration: number;
-}
-
-const STAGES: StageDef[] = [
-  { getText: () => '正在初始化量子随机引擎...', duration: 800 },
-  { getText: (ex) => `正在排除上期干扰项 (${ZODIAC_MAP[ex].cn}·${ZODIAC_MAP[ex].en})... 成功`, duration: 1200 },
-  { getText: () => '正在同步 2026 年马年权重参数... 完毕', duration: 1000 },
-  { getText: () => '正在执行蒙特卡洛 10,000 次模拟... 锁定结果', duration: 1500 },
-  { getText: () => '正在生成特码与平码推荐矩阵... 就绪', duration: 500 },
+const STAGES = [
+  { text: '正在初始化量子随机引擎...', duration: 800 },
+  { text: '正在加载 2026 年马年权重矩阵...', duration: 1200 },
+  { text: '正在校准 12 生肖概率模型...', duration: 1000 },
+  { text: '正在执行蒙特卡洛 10,000 次模拟... 锁定结果', duration: 1500 },
+  { text: '正在生成特码与平码推荐矩阵... 就绪', duration: 500 },
 ];
 
 const TOTAL = STAGES.reduce((s, st) => s + st.duration, 0);
 
-interface Props {
-  excludedZodiac: string;
-}
-
-export default function ScanningAnimation({ excludedZodiac }: Props) {
+export default function ScanningAnimation() {
   const [visibleCount, setVisibleCount] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -77,7 +67,7 @@ export default function ScanningAnimation({ excludedZodiac }: Props) {
           >
             <span className="text-text-secondary shrink-0">[{now}]</span>
             <span className={i < visibleCount ? 'text-accent' : 'text-text-secondary/40'}>
-              {stage.getText(excludedZodiac)}
+              {stage.text}
             </span>
             {i < visibleCount && (
               <span className="text-accent ml-auto shrink-0">OK</span>

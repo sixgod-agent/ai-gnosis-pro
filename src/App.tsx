@@ -1,12 +1,11 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, Play, Shield, TrendingUp } from 'lucide-react';
-import { generatePrediction, ZODIAC_MAP, type Prediction } from './lib/zodiacConfig';
+import { generatePrediction, type Prediction } from './lib/zodiacConfig';
 import Background from './components/Background';
 import MetricsBar from './components/MetricsBar';
 import ScanningAnimation from './components/ScanningAnimation';
 import PredictionPanel from './components/PredictionPanel';
-import HistoryTable from './components/HistoryTable';
 import AdminPanel from './components/AdminPanel';
 
 type Phase = 'idle' | 'scanning' | 'result';
@@ -52,9 +51,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline text-xs text-text-secondary">
-              排除: {ZODIAC_MAP[excluded].emoji} {ZODIAC_MAP[excluded].cn}
-            </span>
             <button
               onClick={() => setAdminOpen(true)}
               className="p-2 rounded-lg hover:bg-card transition-colors cursor-pointer"
@@ -102,7 +98,7 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <ScanningAnimation excludedZodiac={excluded} />
+              <ScanningAnimation />
             </motion.div>
           )}
 
@@ -113,12 +109,10 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <PredictionPanel prediction={prediction} excludedZodiac={excluded} onRescan={startScan} />
+              <PredictionPanel prediction={prediction} onRescan={startScan} />
             </motion.div>
           )}
         </AnimatePresence>
-
-        <HistoryTable />
       </main>
 
       {/* ─── Footer ─── */}

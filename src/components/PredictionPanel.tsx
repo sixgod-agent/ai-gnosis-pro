@@ -1,16 +1,13 @@
 import { motion } from 'framer-motion';
-import { Sparkles, RotateCcw, Zap, XCircle } from 'lucide-react';
+import { Sparkles, RotateCcw, Zap } from 'lucide-react';
 import { ZODIAC_MAP, type Prediction } from '../lib/zodiacConfig';
 
 interface Props {
   prediction: Prediction;
-  excludedZodiac: string;
   onRescan: () => void;
 }
 
-export default function PredictionPanel({ prediction, excludedZodiac, onRescan }: Props) {
-  const excluded = ZODIAC_MAP[excludedZodiac];
-
+export default function PredictionPanel({ prediction, onRescan }: Props) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6">
       {/* Header */}
@@ -28,18 +25,6 @@ export default function PredictionPanel({ prediction, excludedZodiac, onRescan }
           重新扫描
         </button>
       </div>
-
-      {/* Exclusion notice */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="flex items-center gap-2 bg-danger/5 border border-danger/20 rounded-lg px-4 py-2.5 mb-5 text-sm"
-      >
-        <XCircle className="w-4 h-4 text-danger shrink-0" />
-        <span className="text-danger">已排除上期生肖: </span>
-        <span className="text-text-primary font-bold">{excluded.emoji} {excluded.cn} ({excluded.en})</span>
-      </motion.div>
 
       {/* Section: 特码推荐 */}
       <div className="mb-5">
