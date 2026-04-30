@@ -173,6 +173,7 @@ export default function AccuracyPanel({ excluded = 'horse' }: { excluded?: strin
 
       {/* Rate cards */}
       <div className="grid grid-cols-2 gap-2 mb-3">
+
         <div className="bg-bg/50 border border-border/50 rounded-lg p-2.5">
           <div className="text-[10px] text-text-secondary mb-1">全部特码命中</div>
           <div className="text-lg font-mono font-bold text-accent">{pct(stats.all.zodiacWin, stats.all.total)}%</div>

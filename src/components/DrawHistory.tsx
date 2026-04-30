@@ -87,7 +87,7 @@ export default function DrawHistory() {
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="搜索期号/日期"
-              className="bg-bg border border-border rounded px-3 py-1.5 pl-8 text-xs text-text-primary placeholder-text-secondary focus:outline-none focus:border-accent/50 w-36"
+              className="bg-bg border border-border rounded px-3 py-1.5 pl-8 text-xs text-text-primary placeholder-text-secondary focus:outline-none focus:border-accent/50 w-28 sm:w-36"
             />
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function DrawHistory() {
                       </div>
                     </td>
                     <td className="py-2 text-xs text-text-secondary">
-                      <div className="flex flex-wrap gap-1 max-w-[140px]">
+                      <div className="flex flex-wrap gap-1 max-w-[100px] sm:max-w-[140px]">
                         {zodiacs.map((z, i) => (
                           <span
                             key={i}

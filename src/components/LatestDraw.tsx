@@ -45,8 +45,8 @@ export default function LatestDraw() {
           <Trophy className="w-5 h-5 text-warning" />
           <h2 className="text-lg font-bold">最新开奖</h2>
         </div>
-        <div className="flex items-center gap-3 text-xs text-text-secondary">
-          <span className="font-mono text-accent font-bold">第 {latest.expect} 期</span>
+        <div className="flex items-center gap-2 sm:gap-3 text-xs text-text-secondary">
+          <span className="font-mono text-accent font-bold">第{latest.expect}期</span>
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
             {date}
@@ -55,14 +55,14 @@ export default function LatestDraw() {
       </div>
 
       {/* Flat numbers */}
-      <div className="flex items-center justify-center gap-2 mb-3">
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-3 flex-wrap">
         {flatNums.map((n, i) => (
           <motion.span
             key={i}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 1.0 + i * 0.08, type: 'spring', stiffness: 200 }}
-            className="inline-flex items-center justify-center w-10 h-10 rounded-full text-sm font-mono font-bold"
+            className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-mono font-bold"
             style={{
               backgroundColor: WAVE_COLOR_BG[waves[i] as keyof typeof WAVE_COLOR_BG],
               color: WAVE_COLOR_HEX[waves[i] as keyof typeof WAVE_COLOR_HEX],
@@ -79,7 +79,7 @@ export default function LatestDraw() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
-          className="text-lg font-bold text-text-secondary mx-1"
+          className="text-lg font-bold text-text-secondary mx-0.5 sm:mx-1"
         >
           +
         </motion.span>
@@ -89,7 +89,7 @@ export default function LatestDraw() {
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 1.6, type: 'spring', stiffness: 200 }}
-          className="inline-flex items-center justify-center w-12 h-12 rounded-full text-base font-mono font-bold"
+          className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full text-sm sm:text-base font-mono font-bold"
           style={{
             backgroundColor: WAVE_COLOR_BG[specialWave as keyof typeof WAVE_COLOR_BG],
             color: WAVE_COLOR_HEX[specialWave as keyof typeof WAVE_COLOR_HEX],
@@ -102,7 +102,7 @@ export default function LatestDraw() {
       </div>
 
       {/* Zodiac row */}
-      <div className="flex items-center justify-center gap-2 text-xs">
+      <div className="flex items-center justify-center gap-1 sm:gap-2 text-[11px] sm:text-xs flex-wrap">
         {zodiacs.map((z, i) => (
           <span
             key={i}

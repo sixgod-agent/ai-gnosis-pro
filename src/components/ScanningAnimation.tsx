@@ -53,7 +53,7 @@ export default function ScanningAnimation() {
         <span className="text-sm text-accent font-mono">AI-Gnosis v6.0 · 深度扫描中</span>
       </div>
 
-      <div className="bg-bg rounded-lg p-4 font-mono text-sm space-y-2 min-h-[200px]">
+      <div className="bg-bg rounded-lg p-3 sm:p-4 font-mono text-xs sm:text-sm space-y-2 min-h-[200px]">
         {STAGES.map((stage, i) => (
           <motion.div
             key={i}
@@ -63,7 +63,7 @@ export default function ScanningAnimation() {
               x: i < visibleCount ? 0 : -10,
             }}
             transition={{ duration: 0.3 }}
-            className="flex items-start gap-2"
+            className="flex items-start gap-1.5 sm:gap-2"
           >
             <span className="text-text-secondary shrink-0">[{now}]</span>
             <span className={i < visibleCount ? 'text-accent' : 'text-text-secondary/40'}>

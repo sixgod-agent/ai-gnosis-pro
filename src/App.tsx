@@ -57,7 +57,8 @@ export default function App() {
   const startScan = useCallback((period?: string) => {
     setPhase('scanning');
     setTimeout(() => {
-      setPrediction(generatePrediction(excluded));
+      const seed = period || currentPeriodRef.current || '';
+      setPrediction(generatePrediction(excluded, undefined, seed));
       if (period) {
         setTargetPeriod(period);
         setDrawDate(periodToBeijingDate(period));
@@ -116,7 +117,7 @@ export default function App() {
               <h1 className="text-base font-bold tracking-tight leading-tight">
                 AI-Gnosis <span className="text-accent">Pro</span>
               </h1>
-              <p className="text-[10px] text-text-secondary leading-tight">v6.0 · Quantum-Enhanced Prediction Engine</p>
+              <p className="text-[10px] text-text-secondary leading-tight hidden sm:block">v6.0 · Quantum-Enhanced Prediction Engine</p>
             </div>
           </div>
 
@@ -148,8 +149,8 @@ export default function App() {
                 <Shield className="w-10 h-10 text-accent" />
               </div>
               <DailyPoem />
-              <h2 className="text-2xl font-bold mb-2">AI 深度预测引擎</h2>
-              <p className="text-text-secondary mb-8 text-center max-w-md text-sm leading-relaxed">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2">AI 深度预测引擎</h2>
+              <p className="text-text-secondary mb-8 text-center max-w-md text-xs sm:text-sm leading-relaxed px-4">
                 基于量子增强算法与蒙特卡洛模拟，从 49 个号码中精准锁定高概率目标。
               </p>
               <button
@@ -186,10 +187,10 @@ export default function App() {
         </AnimatePresence>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-2 lg:order-1">
             <DrawHistory />
           </div>
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 order-1 lg:order-2">
             <AccuracyPanel excluded={excluded} />
           </div>
         </div>

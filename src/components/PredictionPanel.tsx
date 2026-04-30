@@ -68,12 +68,12 @@ export default function PredictionPanel({ prediction, onRescan, targetPeriod, dr
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-accent" />
-          <h2 className="text-lg font-bold">AI 预测结果</h2>
+          <h2 className="text-base sm:text-lg font-bold">AI 预测结果</h2>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           {targetPeriod && (
             <div className="flex items-center gap-1.5 text-xs">
               <Calendar className="w-3.5 h-3.5 text-accent" />
@@ -85,13 +85,6 @@ export default function PredictionPanel({ prediction, onRescan, targetPeriod, dr
               )}
             </div>
           )}
-          <button
-            onClick={onRescan}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 text-accent rounded-lg hover:bg-accent/20 transition-colors text-sm cursor-pointer"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            重新扫描
-          </button>
           <button
             onClick={onRescan}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 text-accent rounded-lg hover:bg-accent/20 transition-colors text-sm cursor-pointer"
@@ -163,7 +156,7 @@ export default function PredictionPanel({ prediction, onRescan, targetPeriod, dr
           全频谱平码推荐
           <span className="text-[10px] text-text-secondary font-normal ml-1">· 全盘扫描 · 不限生肖</span>
         </h3>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           {prediction.flatCodes.map((n, i) => (
             <motion.div
               key={n}
@@ -182,7 +175,7 @@ export default function PredictionPanel({ prediction, onRescan, targetPeriod, dr
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.1 }}
-        className="grid grid-cols-3 gap-3"
+        className="grid grid-cols-1 sm:grid-cols-3 gap-3"
       >
         {/* 波色分布 */}
         <div className="bg-card/60 border border-border rounded-lg p-3">
