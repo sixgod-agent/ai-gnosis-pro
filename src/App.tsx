@@ -9,6 +9,8 @@ import PredictionPanel from './components/PredictionPanel';
 import AdminPanel from './components/AdminPanel';
 import DailyPoem from './components/DailyPoem';
 import DrawHistory from './components/DrawHistory';
+import LatestDraw from './components/LatestDraw';
+import AccuracyPanel from './components/AccuracyPanel';
 
 type Phase = 'idle' | 'scanning' | 'result';
 
@@ -66,6 +68,8 @@ export default function App() {
       {/* ─── Main ─── */}
       <main className="relative max-w-7xl mx-auto px-4 py-6" style={{ zIndex: 10 }}>
         <MetricsBar />
+        <LatestDraw />
+        <AccuracyPanel excluded={excluded} />
 
         <AnimatePresence mode="wait">
           {phase === 'idle' && (
