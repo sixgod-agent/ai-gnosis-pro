@@ -1,3 +1,37 @@
+// ── 波色 & 大小 ──
+export type WaveColor = 'red' | 'blue' | 'green';
+
+const RED_NUMBERS = new Set([1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46]);
+const BLUE_NUMBERS = new Set([3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48]);
+// green = rest
+
+export function getWaveColor(n: number): WaveColor {
+  if (RED_NUMBERS.has(n)) return 'red';
+  if (BLUE_NUMBERS.has(n)) return 'blue';
+  return 'green';
+}
+
+export function isBig(n: number): boolean { return n >= 25; }
+
+export const WAVE_COLOR_HEX: Record<WaveColor, string> = {
+  red: '#F6465D',
+  blue: '#2B9AFF',
+  green: '#0ECB81',
+};
+
+export const WAVE_COLOR_BG: Record<WaveColor, string> = {
+  red: 'rgba(246,70,93,0.15)',
+  blue: 'rgba(43,154,255,0.15)',
+  green: 'rgba(14,203,129,0.15)',
+};
+
+export const WAVE_COLOR_BORDER: Record<WaveColor, string> = {
+  red: 'rgba(246,70,93,0.35)',
+  blue: 'rgba(43,154,255,0.35)',
+  green: 'rgba(14,203,129,0.35)',
+};
+
+// ── 生肖 ──
 export interface ZodiacInfo {
   cn: string;
   en: string;
