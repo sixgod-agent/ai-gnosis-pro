@@ -2,8 +2,8 @@ name: Daily Fetch Lottery History
 
 on:
   schedule:
-    # 每天北京时间 22:00 执行（UTC 14:00），开奖时间为 21:32
-    - cron: '0 14 * * *'
+    # 每天北京时间 21:40 执行（UTC 13:40），开奖时间为 21:32
+    - cron: '40 13 * * *'
   workflow_dispatch: # 支持手动触发
 
 permissions:
