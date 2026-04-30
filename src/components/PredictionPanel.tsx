@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion';
-import { Sparkles, RotateCcw, Zap, TrendingUp, CircleDot } from 'lucide-react';
+import { Sparkles, RotateCcw, Zap, TrendingUp, CircleDot, Calendar } from 'lucide-react';
 import { ZODIAC_MAP, type Prediction, getWaveColor, isBig, WAVE_COLOR_HEX, WAVE_COLOR_BG, WAVE_COLOR_BORDER } from '../lib/zodiacConfig';
 
 interface Props {
   prediction: Prediction;
   onRescan: () => void;
+  targetPeriod?: string;
+  drawDate?: string;
 }
 
 /* ── 单个号码球 ── */
@@ -53,7 +55,7 @@ function WaveLegend() {
   );
 }
 
-export default function PredictionPanel({ prediction, onRescan }: Props) {
+export default function PredictionPanel({ prediction, onRescan, targetPeriod, drawDate }: Props) {
   const allZodiacNumbers = prediction.selectedZodiacs.flatMap(k => ZODIAC_MAP[k].numbers);
   const allNumbers = [...allZodiacNumbers, ...prediction.flatCodes];
 
@@ -70,15 +72,34 @@ export default function PredictionPanel({ prediction, onRescan }: Props) {
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-accent" />
           <h2 className="text-lg font-bold">AI 预测结果</h2>
-          <span className="text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded font-mono">2026 马年</span>
         </div>
-        <button
-          onClick={onRescan}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 text-accent rounded-lg hover:bg-accent/20 transition-colors text-sm cursor-pointer"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          重新扫描
-        </button>
+        <div className="flex items-center gap-3">
+          {targetPeriod && (
+            <div className="flex items-center gap-1.5 text-xs">
+              <Calendar className="w-3.5 h-3.5 text-accent" />
+              <span className="text-text-secondary">第</span>
+              <span className="text-accent font-mono font-bold">{targetPeriod.slice(-3)}</span>
+              <span className="text-text-secondary">期</span>
+              {drawDate && (
+                <span className="text-text-secondary/60 ml-1">{drawDate}</span>
+              )}
+            </div>
+          )}
+          <button
+            onClick={onRescan}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 text-accent rounded-lg hover:bg-accent/20 transition-colors text-sm cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            重新扫描
+          </button>
+          <button
+            onClick={onRescan}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 text-accent rounded-lg hover:bg-accent/20 transition-colors text-sm cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            重新扫描
+          </button>
+        </div>
       </div>
 
       {/* ── 特码推荐 · 4 生肖 ── */}

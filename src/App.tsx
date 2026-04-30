@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, Play, Shield, TrendingUp } from 'lucide-react';
 import { generatePrediction, type Prediction } from './lib/zodiacConfig';
@@ -12,6 +12,17 @@ import DrawHistory from './components/DrawHistory';
 import LatestDraw from './components/LatestDraw';
 import AccuracyPanel from './components/AccuracyPanel';
 
+/** Get the draw date (Beijing time) for a period number like "2026120" */
+function periodToBeijingDate(period: string): string {
+  const year = parseInt(period.substring(0, 4));
+  const dayOfYear = parseInt(period.substring(4));
+  const d = new Date(year, 0, 1);
+  d.setDate(d.getDate() + dayOfYear - 1);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${year}-${mm}-${dd}`;
+}
+
 type Phase = 'idle' | 'scanning' | 'result';
 
 export default function App() {
@@ -19,14 +30,69 @@ export default function App() {
   const [excluded, setExcluded] = useState('horse');
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [adminOpen, setAdminOpen] = useState(false);
+  const [targetPeriod, setTargetPeriod] = useState('');
+  const [drawDate, setDrawDate] = useState('');
+  const currentPeriodRef = useRef('');
 
-  const startScan = useCallback(() => {
+  // Fetch latest period from history.json and auto-start scan
+  useEffect(() => {
+    fetch('/ai-gnosis-pro/history.json')
+      .then(res => res.json())
+      .then((json: { expect: string }[]) => {
+        if (json.length > 0) {
+          const latest = json[0].expect;
+          const nextPeriod = String(Number(latest) + 1).padStart(7, '0');
+          setTargetPeriod(nextPeriod);
+          setDrawDate(periodToBeijingDate(nextPeriod));
+          currentPeriodRef.current = nextPeriod;
+
+          // Auto-start scan for next period
+          startScan(nextPeriod);
+        }
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const startScan = useCallback((period?: string) => {
     setPhase('scanning');
     setTimeout(() => {
       setPrediction(generatePrediction(excluded));
+      if (period) {
+        setTargetPeriod(period);
+        setDrawDate(periodToBeijingDate(period));
+        currentPeriodRef.current = period;
+      }
       setPhase('result');
     }, 5000);
   }, [excluded]);
+
+  // Auto-refresh: after draw (21:32) + 2 hours (23:32 Beijing = 15:32 UTC), auto-scan next period
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (phase !== 'result' || !targetPeriod) return;
+
+      const now = new Date();
+      const utcH = now.getUTCHours();
+      const utcM = now.getUTCMinutes();
+      const nowUtcMin = utcH * 60 + utcM;
+      // 23:32 Beijing = 15:32 UTC
+      const refreshUtcMin = 15 * 60 + 32;
+
+      if (nowUtcMin >= refreshUtcMin) {
+        const nextPeriod = String(Number(targetPeriod) + 1).padStart(7, '0');
+        // Only auto-refresh if we haven't already scanned for this period
+        if (nextPeriod !== currentPeriodRef.current) {
+          currentPeriodRef.current = nextPeriod;
+          setPhase('idle');
+          setPrediction(null);
+          setTimeout(() => startScan(nextPeriod), 200);
+        }
+      }
+    }, 60_000); // check every minute
+
+    return () => clearInterval(timer);
+  }, [phase, targetPeriod, startScan]);
 
   const handleAdminChange = (zodiac: string) => {
     setExcluded(zodiac);
@@ -87,7 +153,7 @@ export default function App() {
                 基于量子增强算法与蒙特卡洛模拟，从 49 个号码中精准锁定高概率目标。
               </p>
               <button
-                onClick={startScan}
+                onClick={() => startScan()}
                 className="flex items-center gap-2 px-8 py-3 bg-accent text-bg rounded-lg font-bold hover:brightness-110 transition-all cursor-pointer"
               >
                 <Play className="w-4 h-4" />
@@ -114,7 +180,7 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <PredictionPanel prediction={prediction} onRescan={startScan} />
+              <PredictionPanel prediction={prediction} onRescan={startScan} targetPeriod={targetPeriod} drawDate={drawDate} />
             </motion.div>
           )}
         </AnimatePresence>
