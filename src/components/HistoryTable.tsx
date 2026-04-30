@@ -1,158 +1,71 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Trophy, ChevronDown, Calendar } from 'lucide-react'
-import { useLotteryData } from '../hooks/useLotteryData'
-import { WAVE_COLOR_MAP } from '../lib/lotteryData'
+import { motion } from 'framer-motion';
+import { Trophy } from 'lucide-react';
+import { HISTORY_DATA } from '../lib/zodiacConfig';
 
 export default function HistoryTable() {
-  const { latestDraw, history } = useLotteryData()
-  const [showAll, setShowAll] = useState(false)
-  const [filterYear, setFilterYear] = useState<string>('all')
-
-  const allDraws = [latestDraw, ...history]
-  const filteredDraws = filterYear === 'all'
-    ? allDraws
-    : allDraws.filter(d => d.expect.startsWith(filterYear))
-
-  const years = Array.from(new Set(allDraws.map(d => d.expect.slice(0, 4)))).sort().reverse()
-  const displayDraws = showAll ? filteredDraws : filteredDraws.slice(0, 15)
+  const wins = HISTORY_DATA.filter(h => h.won).length;
+  const total = HISTORY_DATA.length;
+  const rate = ((wins / total) * 100).toFixed(0);
 
   return (
     <motion.div
-      initial={{ y: 30, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, delay: 0.4 }}
-      className="glass-card rounded-xl p-3 sm:p-5"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.2 }}
+      className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 mb-6"
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-1.5">
-          <Trophy className="w-3.5 h-3.5 text-gold" />
-          <h2 className="text-[11px] sm:text-sm font-bold text-text-primary tracking-wide uppercase">
-            历史开奖 | Draw History
-          </h2>
-          <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded bg-gold/10 text-gold border border-gold/20">
-            {filteredDraws.length}期
-          </span>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2">
+          <Trophy className="w-5 h-5 text-warning" />
+          <h2 className="text-lg font-bold">历史战绩</h2>
         </div>
-        <div className="flex items-center gap-1">
-          <Calendar className="w-3 h-3 text-text-secondary" />
-          <select
-            value={filterYear}
-            onChange={e => { setFilterYear(e.target.value); setShowAll(false) }}
-            className="bg-bg-tertiary/50 border border-border/50 rounded px-1.5 py-0.5 text-[9px] sm:text-[10px] text-text-primary outline-none cursor-pointer"
-          >
-            <option value="all">全部年份</option>
-            {years.map(y => <option key={y} value={y}>{y}年</option>)}
-          </select>
+        <div className="flex items-center gap-4 text-sm font-mono">
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 bg-success rounded-full" />
+            <span className="text-success font-bold">{wins} 胜</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 bg-danger rounded-full" />
+            <span className="text-danger font-bold">{total - wins} 负</span>
+          </span>
+          <span className="text-text-secondary">命中率 <span className="text-accent font-bold">{rate}%</span></span>
         </div>
       </div>
 
-      {/* Desktop Table */}
-      <div className="hidden sm:block overflow-x-auto">
-        <table className="w-full text-xs">
+      <div className="overflow-x-auto -mx-4 px-4">
+        <table className="w-full text-sm min-w-[500px]">
           <thead>
-            <tr className="border-b border-border">
-              <th className="text-left py-2 px-2 text-text-secondary font-medium">期号</th>
-              <th className="text-center py-2 px-1 text-text-secondary font-medium">开奖号码</th>
-              <th className="text-center py-2 px-2 text-text-secondary font-medium">波色</th>
-              <th className="text-center py-2 px-2 text-text-secondary font-medium">生肖</th>
-              <th className="text-right py-2 px-2 text-text-secondary font-medium">开奖时间</th>
+            <tr className="text-text-secondary text-xs border-b border-border">
+              <th className="text-left pb-3 font-medium">期号</th>
+              <th className="text-left pb-3 font-medium">日期</th>
+              <th className="text-left pb-3 font-medium">推荐生肖</th>
+              <th className="text-center pb-3 font-medium">开奖号码</th>
+              <th className="text-right pb-3 font-medium">结果</th>
             </tr>
           </thead>
           <tbody>
-            {displayDraws.map((draw, i) => (
-              <motion.tr
-                key={draw.expect}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: Math.min(0.5 + i * 0.02, 1.5) }}
-                className={`border-b border-border/50 hover:bg-bg-tertiary/30 transition-colors ${i === 0 ? 'bg-gold/5' : ''}`}
-              >
-                <td className="py-2 px-2 number-mono text-text-secondary">{draw.expect}</td>
-                <td className="py-2 px-1">
-                  <div className="flex items-center justify-center gap-1">
-                    {draw.numbers.map((num, j) => (
-                      <span
-                        key={j}
-                        className={`inline-flex items-center justify-center w-7 h-7 rounded-md font-bold number-mono text-[11px] ${WAVE_COLOR_MAP[draw.waves[j]]?.bg ?? ''} ${WAVE_COLOR_MAP[draw.waves[j]]?.border ?? 'border-border/50'} ${WAVE_COLOR_MAP[draw.waves[j]]?.css ?? 'text-text-primary'}`}
-                      >
-                        {String(num).padStart(2, '0')}
-                      </span>
-                    ))}
-                  </div>
+            {HISTORY_DATA.map((r) => (
+              <tr key={r.period} className="border-b border-border/40 hover:bg-bg/50 transition-colors">
+                <td className="py-2.5 font-mono text-text-secondary">{r.period}</td>
+                <td className="py-2.5 text-text-secondary">{r.date}</td>
+                <td className="py-2.5 text-accent font-medium">{r.prediction}</td>
+                <td className="py-2.5 text-center font-mono font-bold text-text-primary">{r.result}</td>
+                <td className="py-2.5 text-right">
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${
+                      r.won
+                        ? 'bg-success/10 text-success'
+                        : 'bg-danger/10 text-danger'
+                    }`}
+                  >
+                    {r.won ? '命中' : '未中'}
+                  </span>
                 </td>
-                <td className="py-2 px-2 text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    {draw.waves.map((w, j) => (
-                      <span key={j} className={`text-[9px] font-medium ${WAVE_COLOR_MAP[w]?.css ?? 'text-text-secondary'}`}>
-                        {w}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                <td className="py-2 px-2 text-center">
-                  <div className="flex items-center justify-center gap-0.5 text-[9px]">
-                    {draw.zodiacs.map((z, j) => (
-                      <span key={j} className="text-text-secondary">{z}</span>
-                    ))}
-                  </div>
-                </td>
-                <td className="py-2 px-2 text-right number-mono text-[10px] text-text-secondary/60">
-                  {draw.openTime.split(' ')[0].slice(5)}
-                </td>
-              </motion.tr>
+              </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      {/* Mobile: Card layout */}
-      <div className="sm:hidden space-y-1.5">
-        {displayDraws.map((draw, i) => (
-          <motion.div
-            key={draw.expect}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: Math.min(0.5 + i * 0.02, 1.5) }}
-            className={`rounded-lg p-2.5 ${i === 0 ? 'bg-gold/5 border border-gold/20' : 'bg-bg-tertiary/30 border border-border/30'}`}
-          >
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] number-mono text-text-secondary font-medium">{draw.expect}</span>
-              <span className="text-[9px] number-mono text-text-secondary/60">{draw.openTime.split(' ')[0].slice(5)}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              {draw.numbers.map((num, j) => (
-                <span
-                  key={j}
-                  className={`inline-flex items-center justify-center w-7 h-7 rounded-md font-bold number-mono text-[10px] ${WAVE_COLOR_MAP[draw.waves[j]]?.bg ?? ''} ${WAVE_COLOR_MAP[draw.waves[j]]?.border ?? 'border-border/50'} ${WAVE_COLOR_MAP[draw.waves[j]]?.css ?? 'text-text-primary'}`}
-                >
-                  {String(num).padStart(2, '0')}
-                </span>
-              ))}
-            </div>
-            <div className="flex items-center justify-between mt-1">
-              <div className="flex items-center gap-1 text-[8px] text-text-secondary">
-                {draw.waves.map((w, j) => (
-                  <span key={j} className={WAVE_COLOR_MAP[w]?.css}>{w}</span>
-                ))}
-              </div>
-              <div className="flex items-center gap-0.5 text-[8px] text-text-secondary">
-                {draw.zodiacs.map((z, j) => <span key={j}>{z}</span>)}
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {filteredDraws.length > 15 && (
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="w-full flex items-center justify-center gap-1 py-2 mt-2 text-[10px] text-text-secondary hover:text-text-primary transition-colors"
-        >
-          <ChevronDown className={`w-3 h-3 transition-transform ${showAll ? 'rotate-180' : ''}`} />
-          {showAll ? '收起' : `展开全部 ${filteredDraws.length} 期`}
-        </button>
-      )}
     </motion.div>
-  )
+  );
 }

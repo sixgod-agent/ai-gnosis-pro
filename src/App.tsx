@@ -1,145 +1,145 @@
-import { useState, useCallback } from 'react'
-import { motion } from 'framer-motion'
-import { Brain, Fingerprint, Info } from 'lucide-react'
-import NumberMatrix from './components/NumberMatrix'
-import LoadingScreen from './components/LoadingScreen'
-import AIStatusBar from './components/AIStatusBar'
-import CountdownTimer from './components/CountdownTimer'
-import MainPredictor from './components/MainPredictor'
-import HistoryTable from './components/HistoryTable'
-import ZodiacOverview from './components/ZodiacOverview'
-import TrendChart from './components/TrendChart'
-import ColorAnalysis from './components/ColorAnalysis'
-import HotColdRanking from './components/HotColdRanking'
-import MissingValues from './components/MissingValues'
-import AIRecommendation from './components/AIRecommendation'
-import TodayPick from './components/TodayPick'
-import ExpertBoard from './components/ExpertBoard'
-import Leaderboard from './components/Leaderboard'
-import ModelInfo from './components/ModelInfo'
-import { getSession } from './lib/storage'
+import { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Settings, Play, Shield, TrendingUp } from 'lucide-react';
+import { generatePrediction, ZODIAC_MAP, type Prediction } from './lib/zodiacConfig';
+import Background from './components/Background';
+import MetricsBar from './components/MetricsBar';
+import ScanningAnimation from './components/ScanningAnimation';
+import PredictionPanel from './components/PredictionPanel';
+import HistoryTable from './components/HistoryTable';
+import AdminPanel from './components/AdminPanel';
+
+type Phase = 'idle' | 'scanning' | 'result';
 
 export default function App() {
-  const [loading, setLoading] = useState(true)
-  const session = getSession()
+  const [phase, setPhase] = useState<Phase>('idle');
+  const [excluded, setExcluded] = useState('horse');
+  const [prediction, setPrediction] = useState<Prediction | null>(null);
+  const [adminOpen, setAdminOpen] = useState(false);
 
-  const handleLoadComplete = useCallback(() => {
-    setLoading(false)
-  }, [])
+  const startScan = useCallback(() => {
+    setPhase('scanning');
+    setTimeout(() => {
+      setPrediction(generatePrediction(excluded));
+      setPhase('result');
+    }, 5000);
+  }, [excluded]);
 
-  if (loading) {
-    return (
-      <>
-        <NumberMatrix />
-        <LoadingScreen onComplete={handleLoadComplete} />
-      </>
-    )
-  }
+  const handleAdminChange = (zodiac: string) => {
+    setExcluded(zodiac);
+    setAdminOpen(false);
+    setPhase('idle');
+    setPrediction(null);
+  };
 
   return (
-    <div className="min-h-screen bg-bg-primary relative">
-      <NumberMatrix />
+    <div className="min-h-screen bg-bg text-text-primary relative overflow-hidden">
+      <Background />
 
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <motion.div
-          className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-green/30 to-transparent"
-          animate={{ top: ['-10px', '100vh'] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-        />
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-3 py-3 flex flex-col gap-3">
-        {/* Header */}
-        <motion.header
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center justify-between"
-        >
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-neon-green/20 to-gold/20 flex items-center justify-center border border-neon-green/20">
-              <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-neon-green" />
+      {/* ─── Header ─── */}
+      <header className="relative border-b border-border" style={{ zIndex: 10 }}>
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-bg" />
             </div>
             <div>
-              <h1 className="text-base sm:text-lg font-bold text-text-primary tracking-tight leading-tight">
-                AI-Gnosis <span className="text-neon-green">Pro v5.0</span>
+              <h1 className="text-base font-bold tracking-tight leading-tight">
+                AI-Gnosis <span className="text-accent">Pro</span>
               </h1>
-              <p className="text-[9px] sm:text-[10px] text-text-secondary number-mono hidden xs:block">
-                量子增强型大数据预测终端 | 2026 马年周期
-              </p>
+              <p className="text-[10px] text-text-secondary leading-tight">v6.0 · Quantum-Enhanced Prediction Engine</p>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-2 px-2.5 py-1.5 rounded-lg glass-card">
-            <Fingerprint className="w-3 h-3 text-text-secondary" />
-            <div>
-              <div className="text-[9px] text-text-secondary">Analytic ID</div>
-              <div className="text-[10px] text-text-primary number-mono font-medium">
-                {session.analyticId.slice(0, 18)}...
-              </div>
-            </div>
-          </div>
-        </motion.header>
 
-        {/* AI Status Bar */}
-        <AIStatusBar />
-
-        {/* Countdown Timer */}
-        <CountdownTimer />
-
-        {/* Main Predictor */}
-        <MainPredictor />
-
-        {/* Today's Picks */}
-        <TodayPick />
-
-        {/* AI Recommendation */}
-        <AIRecommendation />
-
-        {/* Trend Charts & Analysis */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <TrendChart />
-          <ColorAnalysis />
-        </div>
-
-        {/* Hot/Cold & Missing Values */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <HotColdRanking />
-          <MissingValues />
-        </div>
-
-        {/* History Table */}
-        <HistoryTable />
-
-        {/* Expert Board & Leaderboard */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <ExpertBoard />
-          <Leaderboard />
-        </div>
-
-        {/* Zodiac Overview */}
-        <ZodiacOverview />
-
-        {/* Model Info */}
-        <ModelInfo />
-
-        {/* Footer */}
-        <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="flex flex-col items-center gap-2 py-4 border-t border-border/30"
-        >
-          <div className="flex items-center gap-1.5 text-text-secondary/50">
-            <Info className="w-3 h-3" />
-            <span className="text-[10px]">
-              本站仅供 AI 概率建模实验研究使用 | For AI probabilistic modeling research only
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:inline text-xs text-text-secondary">
+              排除: {ZODIAC_MAP[excluded].emoji} {ZODIAC_MAP[excluded].cn}
             </span>
+            <button
+              onClick={() => setAdminOpen(true)}
+              className="p-2 rounded-lg hover:bg-card transition-colors cursor-pointer"
+            >
+              <Settings className="w-4 h-4 text-text-secondary" />
+            </button>
           </div>
-          <div className="text-[9px] text-text-secondary/30 number-mono">
-            AI-Gnosis Pro v5.0 &copy; 2026 | Quantum-Enhanced Prediction Terminal | All data is real-time
-          </div>
-        </motion.footer>
-      </div>
+        </div>
+      </header>
+
+      {/* ─── Main ─── */}
+      <main className="relative max-w-7xl mx-auto px-4 py-6" style={{ zIndex: 10 }}>
+        <MetricsBar />
+
+        <AnimatePresence mode="wait">
+          {phase === 'idle' && (
+            <motion.div
+              key="idle"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center py-16"
+            >
+              <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mb-6 border border-accent/20">
+                <Shield className="w-10 h-10 text-accent" />
+              </div>
+              <h2 className="text-2xl font-bold mb-2">AI 深度预测引擎</h2>
+              <p className="text-text-secondary mb-8 text-center max-w-md text-sm leading-relaxed">
+                基于量子增强算法与蒙特卡洛模拟，从 49 个号码中精准锁定高概率目标。
+              </p>
+              <button
+                onClick={startScan}
+                className="flex items-center gap-2 px-8 py-3 bg-accent text-bg rounded-lg font-bold hover:brightness-110 transition-all cursor-pointer"
+              >
+                <Play className="w-4 h-4" />
+                启动 AI 深度扫描
+              </button>
+            </motion.div>
+          )}
+
+          {phase === 'scanning' && (
+            <motion.div
+              key="scanning"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <ScanningAnimation excludedZodiac={excluded} />
+            </motion.div>
+          )}
+
+          {phase === 'result' && prediction && (
+            <motion.div
+              key="result"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <PredictionPanel prediction={prediction} excludedZodiac={excluded} onRescan={startScan} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <HistoryTable />
+      </main>
+
+      {/* ─── Footer ─── */}
+      <footer className="relative border-t border-border mt-4" style={{ zIndex: 10 }}>
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <p className="text-center text-xs text-text-secondary">
+            本工具仅供 AI 概率建模实验研究使用，不构成任何投资建议
+          </p>
+        </div>
+      </footer>
+
+      {/* ─── Admin ─── */}
+      <AnimatePresence>
+        {adminOpen && (
+          <AdminPanel
+            onClose={() => setAdminOpen(false)}
+            excludedZodiac={excluded}
+            onExcludeChange={handleAdminChange}
+          />
+        )}
+      </AnimatePresence>
     </div>
-  )
+  );
 }
