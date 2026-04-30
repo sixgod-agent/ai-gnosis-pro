@@ -8,6 +8,7 @@ import ScanningAnimation from './components/ScanningAnimation';
 import PredictionPanel from './components/PredictionPanel';
 import AdminPanel from './components/AdminPanel';
 import DailyPoem from './components/DailyPoem';
+import DrawHistory from './components/DrawHistory';
 
 type Phase = 'idle' | 'scanning' | 'result';
 
@@ -115,6 +116,8 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <DrawHistory />
       </main>
 
       {/* ─── Footer ─── */}
