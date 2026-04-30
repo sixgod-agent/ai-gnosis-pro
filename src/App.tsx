@@ -7,6 +7,7 @@ import MetricsBar from './components/MetricsBar';
 import ScanningAnimation from './components/ScanningAnimation';
 import PredictionPanel from './components/PredictionPanel';
 import AdminPanel from './components/AdminPanel';
+import DailyPoem from './components/DailyPoem';
 
 type Phase = 'idle' | 'scanning' | 'result';
 
@@ -77,6 +78,7 @@ export default function App() {
               <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mb-6 border border-accent/20">
                 <Shield className="w-10 h-10 text-accent" />
               </div>
+              <DailyPoem />
               <h2 className="text-2xl font-bold mb-2">AI 深度预测引擎</h2>
               <p className="text-text-secondary mb-8 text-center max-w-md text-sm leading-relaxed">
                 基于量子增强算法与蒙特卡洛模拟，从 49 个号码中精准锁定高概率目标。
