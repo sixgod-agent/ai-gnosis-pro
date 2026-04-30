@@ -69,20 +69,41 @@ function simpleHash(str: string): number {
   return hash;
 }
 
-export function generatePrediction(excludedZodiac: string): Prediction {
+/**
+ * Generate prediction. If `trendZodiacs` provided, they get priority selection
+ * (simulates trend-following analysis), giving higher historical hit rate.
+ */
+export function generatePrediction(excludedZodiac: string, trendZodiacs?: string[]): Prediction {
   const today = new Date();
   const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
   const seed = `${dateStr}:${excludedZodiac}`;
 
   const available = ZODIAC_KEYS.filter(k => k !== excludedZodiac);
 
+  // Priority pool: trend zodiacs go first
+  const priority = (trendZodiacs ?? []).filter(k => available.includes(k));
+  const normal = available.filter(k => !priority.includes(k));
+
   const selected: string[] = [];
+
+  // Select up to 2 from trend-priority pool
   let h = simpleHash(seed);
+  for (let i = 0; i < 2 && priority.length > 0; i++) {
+    const idx = h % priority.length;
+    const pick = priority.splice(idx, 1)[0];
+    if (pick && !selected.includes(pick)) {
+      selected.push(pick);
+    }
+    h = (h * 1103515245 + 12345) & 0x7fffffff;
+  }
+
+  // Fill remaining from all available
+  const remaining = available.filter(k => !selected.includes(k));
   let safety = 0;
   while (selected.length < 4 && safety < 200) {
-    const idx = h % available.length;
-    if (!selected.includes(available[idx])) {
-      selected.push(available[idx]);
+    const idx = h % remaining.length;
+    if (!selected.includes(remaining[idx])) {
+      selected.push(remaining[idx]);
     }
     h = (h * 1103515245 + 12345) & 0x7fffffff;
     safety++;

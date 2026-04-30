@@ -69,10 +69,8 @@ export default function App() {
       <main className="relative max-w-7xl mx-auto px-4 py-6" style={{ zIndex: 10 }}>
         <MetricsBar />
         <LatestDraw />
-        <AccuracyPanel excluded={excluded} />
 
-        <AnimatePresence mode="wait">
-          {phase === 'idle' && (
+        <AnimatePresence mode="wait">          {phase === 'idle' && (
             <motion.div
               key="idle"
               initial={{ opacity: 0 }}
@@ -121,7 +119,14 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        <DrawHistory />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2">
+            <DrawHistory />
+          </div>
+          <div className="lg:col-span-1">
+            <AccuracyPanel excluded={excluded} />
+          </div>
+        </div>
       </main>
 
       {/* ─── Footer ─── */}

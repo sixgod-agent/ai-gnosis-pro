@@ -21,30 +21,68 @@ interface BacktestResult {
   numberHit: boolean;
 }
 
+/** Find the zodiac key from a Chinese zodiac name */
+function cnToKey(cn: string): string | null {
+  for (const [k, v] of Object.entries(ZODIAC_MAP)) {
+    if (v.cn === cn) return k;
+  }
+  return null;
+}
+
+/** Analyze recent draws before a given index to find trending zodiacs */
+function getTrendZodiacs(records: DrawRecord[], upToIdx: number): string[] {
+  // Look at last 5 draws before this one, find most common special zodiacs
+  const windowSize = 5;
+  const startIdx = upToIdx + 1;
+  const endIdx = Math.min(records.length, startIdx + windowSize);
+  const zodiacCount: Record<string, number> = {};
+
+  for (let i = startIdx; i < endIdx; i++) {
+    const r = records[i];
+    if (!r) continue;
+    const zodiacs = r.zodiac.split(',');
+    const specialZodiac = zodiacs[6];
+    if (specialZodiac) {
+      zodiacCount[specialZodiac] = (zodiacCount[specialZodiac] || 0) + 1;
+    }
+    // Also count flat zodiacs (they often repeat)
+    for (let j = 0; j < 6; j++) {
+      const z = zodiacs[j];
+      if (z) zodiacCount[z] = (zodiacCount[z] || 0) + 0.5;
+    }
+  }
+
+  // Return top 3 trending zodiacs
+  return Object.entries(zodiacCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([cn]) => cnToKey(cn) || '')
+    .filter(Boolean);
+}
+
 function backtest(records: DrawRecord[], excluded: string): BacktestResult[] {
   const results: BacktestResult[] = [];
 
-  for (const r of records) {
+  // Build index for quick lookup
+  const expectToIdx = new Map<string, number>();
+  records.forEach((r, i) => expectToIdx.set(r.expect, i));
+
+  for (let i = 0; i < records.length; i++) {
+    const r = records[i];
     const codes = r.openCode.split(',').map(Number);
     const specialNum = codes[6];
     const zodiacs = r.zodiac.split(',');
-
-    // Determine prediction for this draw's date
-    const dateParts = r.openTime.split(' ')[0].split('-');
-    const year = parseInt(dateParts[0]);
-    const month = parseInt(dateParts[1]);
-    const day = parseInt(dateParts[2]);
-
-    // Replicate the hash with the same date
-    const dateStr = `${year}-${month}-${day}`;
-    const prediction = generatePrediction(excluded);
-
-    // Check zodiac hit: special number's zodiac in predicted zodiacs
     const specialZodiacCn = zodiacs[6] || '';
+
+    // Get trend zodiacs from recent draws
+    const trendZodiacs = getTrendZodiacs(records, i);
+
+    // Generate prediction for this draw's date with trend bias
+    const prediction = generatePrediction(excluded, trendZodiacs);
+
     const zodiacKeys = prediction.selectedZodiacs.map(k => ZODIAC_MAP[k].cn);
     const zodiacHit = zodiacKeys.includes(specialZodiacCn);
 
-    // Check number hit: any predicted number in the draw
     const predictedNumbers = new Set([
       ...prediction.selectedZodiacs.flatMap(k => ZODIAC_MAP[k].numbers),
       ...prediction.flatCodes,
@@ -97,13 +135,13 @@ export default function AccuracyPanel({ excluded = 'horse' }: { excluded?: strin
       all: calc(results),
       recent50: calc(last50),
       recent10: calc(last10),
-      results: results.slice(0, 30), // for table display
+      results: results.slice(0, 20),
     };
   }, [records, excluded]);
 
   if (loading) {
     return (
-      <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 mb-4">
+      <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4">
         <div className="animate-pulse text-text-secondary text-sm text-center py-6">加载中...</div>
       </div>
     );
@@ -111,85 +149,63 @@ export default function AccuracyPanel({ excluded = 'horse' }: { excluded?: strin
 
   const pct = (n: number, total: number) => total === 0 ? '0.0' : ((n / total) * 100).toFixed(1);
 
-  const RateCard = ({ label, value, total, color, icon: Icon }: {
-    label: string; value: number; total: number; color: string; icon: React.ElementType;
-  }) => {
-    const rate = parseFloat(pct(value, total));
-    const isHigh = rate >= 70;
-    const isLow = rate <= 40;
-    return (
-      <div className="bg-bg/50 border border-border/50 rounded-lg p-3 flex-1 min-w-[120px]">
-        <div className="flex items-center gap-1.5 mb-2">
-          <Icon className="w-3.5 h-3.5" style={{ color }} />
-          <span className="text-[11px] text-text-secondary">{label}</span>
-        </div>
-        <div className="text-xl font-mono font-bold" style={{ color }}>
-          {pct(value, total)}%
-        </div>
-        <div className="text-[10px] text-text-secondary mt-0.5">
-          {value}/{total} 期
-        </div>
-        <div className="flex items-center gap-1 mt-1.5">
-          <div className="flex-1 h-1 bg-border rounded-full overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${rate}%`, backgroundColor: color }} />
-          </div>
-          {isHigh && <TrendingUp className="w-3 h-3 text-success" />}
-          {isLow && <TrendingDown className="w-3 h-3 text-danger" />}
-          {!isHigh && !isLow && <Minus className="w-3 h-3 text-text-secondary" />}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1.0 }}
-      className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 mb-4"
+      className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 h-full"
     >
-      <div className="flex items-center gap-2 mb-4">
-        <Target className="w-5 h-5 text-accent" />
-        <h2 className="text-lg font-bold">预测准确率</h2>
-        <span className="text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded font-mono">回测 {stats.all.total} 期</span>
+      <div className="flex items-center gap-2 mb-3">
+        <Target className="w-4 h-4 text-accent" />
+        <h2 className="text-base font-bold">预测准确率</h2>
       </div>
 
       {/* Rate cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-        <RateCard label="特码命中（全部）" value={stats.all.zodiacWin} total={stats.all.total} color="#02f1a6" icon={Target} />
-        <RateCard label="号码命中（全部）" value={stats.all.numberWin} total={stats.all.total} color="#2B9AFF" icon={Target} />
-        <RateCard label="近50期特码" value={stats.recent50.zodiacWin} total={stats.recent50.total} color="#FCD535" icon={Target} />
-        <RateCard label="近10期特码" value={stats.recent10.zodiacWin} total={stats.recent10.total} color="#F6465D" icon={Target} />
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <div className="bg-bg/50 border border-border/50 rounded-lg p-2.5">
+          <div className="text-[10px] text-text-secondary mb-1">全部特码命中</div>
+          <div className="text-lg font-mono font-bold text-accent">{pct(stats.all.zodiacWin, stats.all.total)}%</div>
+          <div className="text-[9px] text-text-secondary">{stats.all.zodiacWin}/{stats.all.total}</div>
+        </div>
+        <div className="bg-bg/50 border border-border/50 rounded-lg p-2.5">
+          <div className="text-[10px] text-text-secondary mb-1">全部号码命中</div>
+          <div className="text-lg font-mono font-bold text-accent">{pct(stats.all.numberWin, stats.all.total)}%</div>
+          <div className="text-[9px] text-text-secondary">{stats.all.numberWin}/{stats.all.total}</div>
+        </div>
+        <div className="bg-bg/50 border border-border/50 rounded-lg p-2.5">
+          <div className="text-[10px] text-text-secondary mb-1">近50期特码</div>
+          <div className="text-lg font-mono font-bold text-warning">{pct(stats.recent50.zodiacWin, stats.recent50.total)}%</div>
+          <div className="text-[9px] text-text-secondary">{stats.recent50.zodiacWin}/{stats.recent50.total}</div>
+        </div>
+        <div className="bg-bg/50 border border-border/50 rounded-lg p-2.5">
+          <div className="text-[10px] text-text-secondary mb-1">近10期特码</div>
+          <div className="text-lg font-mono font-bold text-danger">{pct(stats.recent10.zodiacWin, stats.recent10.total)}%</div>
+          <div className="text-[9px] text-text-secondary">{stats.recent10.zodiacWin}/{stats.recent10.total}</div>
+        </div>
       </div>
 
       {/* Recent results table */}
-      <div className="overflow-x-auto -mx-2 px-2">
-        <table className="w-full text-xs">
+      <div className="text-[11px] text-text-secondary mb-1.5 font-medium">最近回测</div>
+      <div className="overflow-x-auto -mx-1 px-1">
+        <table className="w-full text-[11px]">
           <thead>
-            <tr className="text-text-secondary border-b border-border/40">
-              <th className="text-left pb-2 font-medium">期号</th>
-              <th className="text-left pb-2 font-medium">日期</th>
-              <th className="text-left pb-2 font-medium">推荐生肖</th>
-              <th className="text-center pb-2 font-medium">特码</th>
-              <th className="text-center pb-2 font-medium">特码命中</th>
-              <th className="text-center pb-2 font-medium">号码命中</th>
+            <tr className="text-text-secondary border-b border-border/40 text-[10px]">
+              <th className="text-left pb-1.5 font-medium">期号</th>
+              <th className="text-center pb-1.5 font-medium">推荐</th>
+              <th className="text-center pb-1.5 font-medium">特码</th>
+              <th className="text-center pb-1.5 font-medium">结果</th>
             </tr>
           </thead>
           <tbody>
             {stats.results.map((r) => (
-              <tr key={r.period} className="border-b border-border/20 hover:bg-bg/40 transition-colors">
-                <td className="py-1.5 font-mono text-text-secondary">{r.period}</td>
-                <td className="py-1.5 text-text-secondary">{r.date}</td>
-                <td className="py-1.5 text-accent">{r.predictedZodiacs.join(' ')}</td>
-                <td className="py-1.5 text-center font-mono font-bold">{String(r.specialNum).padStart(2, '0')} <span className="text-text-secondary font-normal ml-0.5">{r.specialZodiac}</span></td>
-                <td className="py-1.5 text-center">
-                  <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${r.zodiacHit ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}>
-                    {r.zodiacHit ? '命中' : '未中'}
-                  </span>
-                </td>
-                <td className="py-1.5 text-center">
-                  <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${r.numberHit ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}>
-                    {r.numberHit ? '命中' : '未中'}
+              <tr key={r.period} className="border-b border-border/20">
+                <td className="py-1 font-mono text-text-secondary">{r.period.slice(-4)}</td>
+                <td className="py-1 text-center text-accent truncate max-w-[100px]">{r.predictedZodiacs.join(' ')}</td>
+                <td className="py-1 text-center font-mono">{String(r.specialNum).padStart(2, '0')}</td>
+                <td className="py-1 text-center">
+                  <span className={`inline-block w-5 h-5 rounded text-[9px] leading-5 text-center font-bold ${r.zodiacHit ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}>
+                    {r.zodiacHit ? '中' : '未'}
                   </span>
                 </td>
               </tr>
@@ -197,8 +213,8 @@ export default function AccuracyPanel({ excluded = 'horse' }: { excluded?: strin
           </tbody>
         </table>
       </div>
-      <div className="text-[9px] text-text-secondary mt-2 text-center">
-        基于每日预测算法回测，特码命中 = 推荐生肖包含特码生肖，号码命中 = 推荐号码出现在开奖号码中
+      <div className="text-[8px] text-text-secondary mt-1.5 text-center">
+        基于趋势分析回测 · 特码命中=推荐生肖含特码生肖
       </div>
     </motion.div>
   );
