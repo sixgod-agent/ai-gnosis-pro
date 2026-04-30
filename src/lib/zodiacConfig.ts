@@ -70,12 +70,16 @@ function simpleHash(str: string): number {
 }
 
 /**
- * Generate prediction. If `trendZodiacs` provided, they get priority selection
- * (simulates trend-following analysis), giving higher historical hit rate.
+ * Generate prediction.
+ * @param excludedZodiac - zodiac to exclude
+ * @param trendZodiacs - zodiac keys with priority selection (trend analysis)
+ * @param dateStr - optional, defaults to today. Used for backtesting historical dates.
  */
-export function generatePrediction(excludedZodiac: string, trendZodiacs?: string[]): Prediction {
-  const today = new Date();
-  const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+export function generatePrediction(excludedZodiac: string, trendZodiacs?: string[], dateStr?: string): Prediction {
+  if (!dateStr) {
+    const today = new Date();
+    dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+  }
   const seed = `${dateStr}:${excludedZodiac}`;
 
   const available = ZODIAC_KEYS.filter(k => k !== excludedZodiac);
@@ -86,9 +90,9 @@ export function generatePrediction(excludedZodiac: string, trendZodiacs?: string
 
   const selected: string[] = [];
 
-  // Select up to 2 from trend-priority pool
+  // Select up to 3 from trend-priority pool
   let h = simpleHash(seed);
-  for (let i = 0; i < 2 && priority.length > 0; i++) {
+  for (let i = 0; i < 3 && priority.length > 0; i++) {
     const idx = h % priority.length;
     const pick = priority.splice(idx, 1)[0];
     if (pick && !selected.includes(pick)) {

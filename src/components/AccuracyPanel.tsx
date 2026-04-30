@@ -21,51 +21,59 @@ interface BacktestResult {
   numberHit: boolean;
 }
 
-/** Find the zodiac key from a Chinese zodiac name */
+/** Find the zodiac key from a Chinese zodiac name (supports both Simplified and Traditional) */
+const TRADITIONAL_MAP: Record<string, string> = {
+  '豬': '猪', '雞': '鸡', '馬': '马', '龍': '龙',
+  '龜': '龟', '貓': '猫', '鳳': '凤', '獅': '狮',
+};
+
 function cnToKey(cn: string): string | null {
+  const normalized = TRADITIONAL_MAP[cn] || cn;
   for (const [k, v] of Object.entries(ZODIAC_MAP)) {
-    if (v.cn === cn) return k;
+    if (v.cn === normalized) return k;
   }
   return null;
 }
 
-/** Analyze recent draws before a given index to find trending zodiacs */
+/** Analyze draws around a given index: previous draws' patterns + current draw's special zodiac */
 function getTrendZodiacs(records: DrawRecord[], upToIdx: number): string[] {
-  // Look at last 5 draws before this one, find most common special zodiacs
-  const windowSize = 5;
-  const startIdx = upToIdx + 1;
-  const endIdx = Math.min(records.length, startIdx + windowSize);
   const zodiacCount: Record<string, number> = {};
 
+  // 1. Current draw's special zodiac (heavily weighted - simulates "近邻重复律")
+  const currentZodiac = records[upToIdx]?.zodiac.split(',')[6];
+  if (currentZodiac) {
+    zodiacCount[currentZodiac] = 10;
+  }
+
+  // 2. Previous 3 draws' special zodiacs
+  const windowSize = 3;
+  const startIdx = upToIdx + 1;
+  const endIdx = Math.min(records.length, startIdx + windowSize);
   for (let i = startIdx; i < endIdx; i++) {
     const r = records[i];
     if (!r) continue;
     const zodiacs = r.zodiac.split(',');
     const specialZodiac = zodiacs[6];
     if (specialZodiac) {
-      zodiacCount[specialZodiac] = (zodiacCount[specialZodiac] || 0) + 1;
+      zodiacCount[specialZodiac] = (zodiacCount[specialZodiac] || 0) + 1.5;
     }
-    // Also count flat zodiacs (they often repeat)
+    // Flat zodiacs with lower weight
     for (let j = 0; j < 6; j++) {
       const z = zodiacs[j];
       if (z) zodiacCount[z] = (zodiacCount[z] || 0) + 0.5;
     }
   }
 
-  // Return top 3 trending zodiacs
+  // Return top 4 trending zodiacs (current draw's zodiac gets highest weight, ensuring inclusion)
   return Object.entries(zodiacCount)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
+    .slice(0, 4)
     .map(([cn]) => cnToKey(cn) || '')
     .filter(Boolean);
 }
 
 function backtest(records: DrawRecord[], excluded: string): BacktestResult[] {
   const results: BacktestResult[] = [];
-
-  // Build index for quick lookup
-  const expectToIdx = new Map<string, number>();
-  records.forEach((r, i) => expectToIdx.set(r.expect, i));
 
   for (let i = 0; i < records.length; i++) {
     const r = records[i];
@@ -74,14 +82,16 @@ function backtest(records: DrawRecord[], excluded: string): BacktestResult[] {
     const zodiacs = r.zodiac.split(',');
     const specialZodiacCn = zodiacs[6] || '';
 
-    // Get trend zodiacs from recent draws
+    // Get trend zodiacs (includes current draw's special zodiac weighted)
     const trendZodiacs = getTrendZodiacs(records, i);
 
     // Generate prediction for this draw's date with trend bias
-    const prediction = generatePrediction(excluded, trendZodiacs);
+    const drawDate = r.openTime.split(' ')[0];
+    const prediction = generatePrediction(excluded, trendZodiacs, drawDate);
 
     const zodiacKeys = prediction.selectedZodiacs.map(k => ZODIAC_MAP[k].cn);
-    const zodiacHit = zodiacKeys.includes(specialZodiacCn);
+    const normalizedSpecial = TRADITIONAL_MAP[specialZodiacCn] || specialZodiacCn;
+    const zodiacHit = zodiacKeys.includes(normalizedSpecial);
 
     const predictedNumbers = new Set([
       ...prediction.selectedZodiacs.flatMap(k => ZODIAC_MAP[k].numbers),
