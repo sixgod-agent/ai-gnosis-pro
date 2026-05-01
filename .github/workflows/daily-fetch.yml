@@ -8,10 +8,14 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   fetch-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,5 +48,26 @@ jobs:
           git commit -m "chore: auto-update lottery history $(date -u +%Y-%m-%d)"
           git push
 
-      # 数据更新后触发部署
-      # push to main 会自动触发 deploy.yml
+      # Build and deploy directly (GITHUB_TOKEN push from cron doesn't trigger other workflows)
+      - name: Setup Node
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Build
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload artifact
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to Pages
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/deploy-pages@v4
