@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, Play, Shield, TrendingUp } from 'lucide-react';
-import { generatePrediction, type Prediction } from './lib/zodiacConfig';
+import { generatePrediction, ZODIAC_MAP, type Prediction } from './lib/zodiacConfig';
 import Background from './components/Background';
 import MetricsBar from './components/MetricsBar';
 import ScanningAnimation from './components/ScanningAnimation';
@@ -11,6 +11,19 @@ import DailyPoem from './components/DailyPoem';
 import DrawHistory from './components/DrawHistory';
 import LatestDraw from './components/LatestDraw';
 import AccuracyPanel from './components/AccuracyPanel';
+
+const TRADITIONAL_MAP: Record<string, string> = {
+  '豬': '猪', '雞': '鸡', '馬': '马', '龍': '龙',
+  '龜': '龟', '貓': '猫', '鳳': '凤', '獅': '狮',
+};
+
+function cnToKey(cn: string): string | null {
+  const normalized = TRADITIONAL_MAP[cn] || cn;
+  for (const [k, v] of Object.entries(ZODIAC_MAP)) {
+    if (v.cn === normalized) return k;
+  }
+  return null;
+}
 
 /** Get the draw date (Beijing time) for a period number like "2026120" */
 function periodToBeijingDate(period: string): string {
@@ -38,20 +51,28 @@ export default function App() {
   useEffect(() => {
     fetch('/ai-gnosis-pro/history.json')
       .then(res => res.json())
-      .then((json: { expect: string }[]) => {
+      .then((json: { expect: string; zodiac: string }[]) => {
         if (json.length > 0) {
           const latest = json[0].expect;
+          // Auto-derive excluded zodiac from latest draw's special code (index 6)
+          const specialZodiacCn = json[0].zodiac.split(',')[6];
+          const autoExcluded = specialZodiacCn ? cnToKey(specialZodiacCn) : null;
+          if (autoExcluded) setExcluded(autoExcluded);
           const nextPeriod = String(Number(latest) + 1).padStart(7, '0');
           setTargetPeriod(nextPeriod);
           setDrawDate(periodToBeijingDate(nextPeriod));
           currentPeriodRef.current = nextPeriod;
 
-          // Auto-start scan for next period
-          startScan(nextPeriod);
+          // Auto-start scan with the derived excluded zodiac
+          const excludedZodiac = autoExcluded || excluded;
+          setPhase('scanning');
+          setTimeout(() => {
+            setPrediction(generatePrediction(excludedZodiac, undefined, nextPeriod));
+            setPhase('result');
+          }, 5000);
         }
       })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startScan = useCallback((period?: string) => {
