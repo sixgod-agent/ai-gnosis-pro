@@ -1,5 +1,12 @@
 [
   {
+    "expect": "2026274",
+    "openTime": "2026-10-01 21:32:32",
+    "openCode": "12,16,32,05,39,36,33",
+    "wave": "red,green,green,green,green,blue,green",
+    "zodiac": "羊,兔,豬,虎,龍,羊,狗"
+  },
+  {
     "expect": "2026273",
     "openTime": "2026-09-30 21:32:32",
     "openCode": "30,03,25,28,06,17,05",
